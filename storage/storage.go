@@ -31,8 +31,8 @@ func (s *storage) Deposit(ctx context.Context, wallet types.WalletID, amount int
 	}
 
 	var balance int
-	if err := tx.QueryRowContext(ctx, queryLockWalletForUpdate, wallet).Scan(&balance); err != nil {
-		return completeTx(tx, errors.Wrap(err, "lock wallet row"))
+	if err := tx.QueryRowContext(ctx, queryLockWalletForCreate, wallet).Scan(&balance); err != nil {
+		return completeTx(tx, errors.Wrap(err, "lock wallet"))
 	}
 
 	if _, err := tx.ExecContext(ctx, queryInsertOperation, wallet, types.OperationTypeDeposit, amount); err != nil {
@@ -46,5 +46,62 @@ func (s *storage) Deposit(ctx context.Context, wallet types.WalletID, amount int
 	return completeTx(tx, nil)
 }
 func (s *storage) Transfer(ctx context.Context, fromWallet, toWallet types.WalletID, amount int) error {
-	return nil
+	tx, err := s.conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return errors.Wrap(err, "begin transaction")
+	}
+
+	rows, err := tx.QueryContext(ctx, queryLockWalletsForTransfer, fromWallet, toWallet)
+	if err != nil {
+		return completeTx(tx, errors.Wrap(err, "lock wallets"))
+	}
+
+	var from, to struct {
+		id      string
+		balance int
+	}
+
+	for rows.Next() {
+		var (
+			id      string
+			balance int
+		)
+		if err := rows.Scan(&id, &balance); err != nil {
+			return completeTx(tx, errors.Wrap(err, "scan rows"))
+		}
+
+		if id == string(fromWallet) {
+			from.id = id
+			from.balance = balance
+		} else {
+			to.id = id
+			to.balance = balance
+		}
+	}
+
+	if from.balance-amount < 0 {
+		return completeTx(tx, types.ErrUnavailableBalance)
+	}
+
+	// add withdraw operation on fromWallet
+	if _, err := tx.ExecContext(ctx, queryInsertOperation, fromWallet, types.OperationTypeWithdraw, amount); err != nil {
+		return completeTx(tx, errors.Wrap(err, "create operation withdraw"))
+	}
+
+	// add deposit operation on toWallet
+	if _, err := tx.ExecContext(ctx, queryInsertOperation, toWallet, types.OperationTypeDeposit, amount); err != nil {
+		return completeTx(tx, errors.Wrap(err, "create operation deposit"))
+	}
+
+	// change fromWallet balance
+	if _, err := tx.ExecContext(ctx, queryUpdateWallet, from.balance-amount, fromWallet); err != nil {
+		return completeTx(tx, errors.Wrap(err, "update fromWallet balance"))
+	}
+
+	// change toWallet balance
+	if _, err := tx.ExecContext(ctx, queryUpdateWallet, to.balance+amount, toWallet); err != nil {
+		return completeTx(tx, errors.Wrap(err, "update toWallet balance"))
+	}
+
+	return completeTx(tx, nil)
 }

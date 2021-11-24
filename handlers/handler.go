@@ -49,6 +49,7 @@ func New(wg walletGenerator, s storage, r reporter) *Handler {
 func writeErrorResponse(w http.ResponseWriter, code int, err error) {
 	log.WithError(err).Error("handler error")
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if _, err = w.Write(errorResponse(err)); err != nil {
 		log.WithError(err).Error("failed to write erroneous response")

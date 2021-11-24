@@ -14,8 +14,12 @@ var (
 		VALUES ($1, 0, DEFAULT)`,
 	)
 
-	queryLockWalletForUpdate = removeExtraWhitespaces(`
+	queryLockWalletForCreate = removeExtraWhitespaces(`
 		SELECT balance FROM wallet WHERE id = $1 FOR UPDATE`,
+	)
+
+	queryLockWalletsForTransfer = removeExtraWhitespaces(`
+		SELECT id, balance FROM wallet WHERE id IN($1,$2) FOR UPDATE`,
 	)
 
 	queryInsertOperation = removeExtraWhitespaces(`
