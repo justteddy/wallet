@@ -113,9 +113,7 @@ func setupLogger(env string) {
 
 func setupRouter() http.Handler {
 	router := httprouter.New()
-	router.POST("/wallet", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-
-	})
+	router.POST("/wallet")
 
 	return router
 }
