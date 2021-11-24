@@ -22,23 +22,8 @@ func (h *Handler) HandleTransfer(w http.ResponseWriter, r *http.Request, params 
 		return
 	}
 
-	if transferReq.FromWallet == "" {
-		writeErrorResponse(w, http.StatusBadRequest, errors.New("from_wallet is required"))
-		return
-	}
-
-	if transferReq.ToWallet == "" {
-		writeErrorResponse(w, http.StatusBadRequest, errors.New("to_wallet is required"))
-		return
-	}
-
-	if transferReq.FromWallet == transferReq.ToWallet {
-		writeErrorResponse(w, http.StatusBadRequest, errors.New("similar wallets provided"))
-		return
-	}
-
-	if transferReq.Amount <= 0 {
-		writeErrorResponse(w, http.StatusBadRequest, errors.New("invalid amount"))
+	if err := h.validateTransferRequest(transferReq); err != nil {
+		writeErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -53,4 +38,24 @@ func (h *Handler) HandleTransfer(w http.ResponseWriter, r *http.Request, params 
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) validateTransferRequest(transferReq transferRequest) error {
+	if transferReq.FromWallet == "" {
+		return errors.New("from_wallet is required")
+	}
+
+	if transferReq.ToWallet == "" {
+		return errors.New("to_wallet is required")
+	}
+
+	if transferReq.FromWallet == transferReq.ToWallet {
+		return errors.New("similar wallets provided")
+	}
+
+	if transferReq.Amount <= 0 {
+		return errors.New("invalid amount")
+	}
+
+	return nil
 }

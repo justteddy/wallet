@@ -110,6 +110,7 @@ func setupRouter(handler *handlers.Handler) http.Handler {
 	router.POST("/wallet", handler.HandleCreateWallet)
 	router.POST("/deposit/:wallet", handler.HandleDeposit)
 	router.POST("/transfer", handler.HandleTransfer)
+	router.POST("/report/:format/:wallet", handler.HandleReport)
 
 	return router
 }

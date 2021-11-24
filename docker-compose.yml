@@ -1,5 +1,6 @@
 version: "3.9"
 services:
+
   db:
     image: postgres:14.1
     restart: always
@@ -10,3 +11,16 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
+  wallet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    command:
+      - -db-dsn
+      - 'postgres://postgres:postgres@db:5432/wallets?sslmode=disable'
+    depends_on:
+      - db

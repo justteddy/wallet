@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/justteddy/wallet/types"
@@ -20,7 +21,6 @@ func New(conn *sqlx.DB) *storage {
 
 func (s *storage) CreateWallet(ctx context.Context, wallet types.WalletID) error {
 	_, err := s.conn.ExecContext(ctx, queryInsertWallet, wallet)
-
 	return errors.Wrap(err, "create wallet query error")
 }
 
@@ -45,6 +45,7 @@ func (s *storage) Deposit(ctx context.Context, wallet types.WalletID, amount int
 
 	return completeTx(tx, nil)
 }
+
 func (s *storage) Transfer(ctx context.Context, fromWallet, toWallet types.WalletID, amount int) error {
 	tx, err := s.conn.BeginTxx(ctx, nil)
 	if err != nil {
@@ -104,4 +105,8 @@ func (s *storage) Transfer(ctx context.Context, fromWallet, toWallet types.Walle
 	}
 
 	return completeTx(tx, nil)
+}
+
+func (s *storage) Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.Operation, error) {
+	return nil, nil
 }

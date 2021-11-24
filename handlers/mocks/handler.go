@@ -102,6 +102,21 @@ func (mr *MockstorageMockRecorder) Deposit(ctx, wallet, amount interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Deposit", reflect.TypeOf((*Mockstorage)(nil).Deposit), ctx, wallet, amount)
 }
 
+// Operations mocks base method.
+func (m *Mockstorage) Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.Operation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Operations", ctx, wallet, opType, from, to)
+	ret0, _ := ret[0].([]types.Operation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Operations indicates an expected call of Operations.
+func (mr *MockstorageMockRecorder) Operations(ctx, wallet, opType, from, to interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Operations", reflect.TypeOf((*Mockstorage)(nil).Operations), ctx, wallet, opType, from, to)
+}
+
 // Transfer mocks base method.
 func (m *Mockstorage) Transfer(ctx context.Context, fromWallet, toWallet types.WalletID, amount int) error {
 	m.ctrl.T.Helper()
@@ -116,37 +131,40 @@ func (mr *MockstorageMockRecorder) Transfer(ctx, fromWallet, toWallet, amount in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Transfer", reflect.TypeOf((*Mockstorage)(nil).Transfer), ctx, fromWallet, toWallet, amount)
 }
 
-// Mockreporter is a mock of reporter interface.
-type Mockreporter struct {
+// Mockexporter is a mock of exporter interface.
+type Mockexporter struct {
 	ctrl     *gomock.Controller
-	recorder *MockreporterMockRecorder
+	recorder *MockexporterMockRecorder
 }
 
-// MockreporterMockRecorder is the mock recorder for Mockreporter.
-type MockreporterMockRecorder struct {
-	mock *Mockreporter
+// MockexporterMockRecorder is the mock recorder for Mockexporter.
+type MockexporterMockRecorder struct {
+	mock *Mockexporter
 }
 
-// NewMockreporter creates a new mock instance.
-func NewMockreporter(ctrl *gomock.Controller) *Mockreporter {
-	mock := &Mockreporter{ctrl: ctrl}
-	mock.recorder = &MockreporterMockRecorder{mock}
+// NewMockexporter creates a new mock instance.
+func NewMockexporter(ctrl *gomock.Controller) *Mockexporter {
+	mock := &Mockexporter{ctrl: ctrl}
+	mock.recorder = &MockexporterMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *Mockreporter) EXPECT() *MockreporterMockRecorder {
+func (m *Mockexporter) EXPECT() *MockexporterMockRecorder {
 	return m.recorder
 }
 
-// Report mocks base method.
-func (m *Mockreporter) Report(ctx context.Context, format types.ReportFormat, opType types.OperationType, wallet types.WalletID, dateFrom, dateTo time.Time) {
+// Export mocks base method.
+func (m *Mockexporter) Export(format types.ExportFormat, ops []types.Operation) ([]byte, error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Report", ctx, format, opType, wallet, dateFrom, dateTo)
+	ret := m.ctrl.Call(m, "Export", format, ops)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// Report indicates an expected call of Report.
-func (mr *MockreporterMockRecorder) Report(ctx, format, opType, wallet, dateFrom, dateTo interface{}) *gomock.Call {
+// Export indicates an expected call of Export.
+func (mr *MockexporterMockRecorder) Export(format, ops interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Report", reflect.TypeOf((*Mockreporter)(nil).Report), ctx, format, opType, wallet, dateFrom, dateTo)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Export", reflect.TypeOf((*Mockexporter)(nil).Export), format, ops)
 }

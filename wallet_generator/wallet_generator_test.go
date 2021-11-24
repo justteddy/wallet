@@ -38,9 +38,9 @@ func TestGenerateWalletID(t *testing.T) {
 	wg.Wait()
 	close(walletsCh)
 
-	// wait until all wallets written
+	// wait until all wallets will be written
 	<-done
 
-	// check if all wallet identifiers are unique
+	// ensure that all wallet identifiers are unique
 	assert.Len(t, wallets, 100_000)
 }

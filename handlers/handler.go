@@ -20,29 +20,24 @@ type storage interface {
 	CreateWallet(ctx context.Context, wallet types.WalletID) error
 	Deposit(ctx context.Context, wallet types.WalletID, amount int) error
 	Transfer(ctx context.Context, fromWallet, toWallet types.WalletID, amount int) error
+	Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.Operation, error)
 }
 
-type reporter interface {
-	Report(
-		ctx context.Context,
-		format types.ReportFormat,
-		opType types.OperationType,
-		wallet types.WalletID,
-		dateFrom, dateTo time.Time,
-	)
+type exporter interface {
+	Export(format types.ExportFormat, ops []types.Operation) ([]byte, error)
 }
 
 type Handler struct {
 	wg walletGenerator
 	s  storage
-	r  reporter
+	e  exporter
 }
 
-func New(wg walletGenerator, s storage, r reporter) *Handler {
+func New(wg walletGenerator, s storage, e exporter) *Handler {
 	return &Handler{
 		wg: wg,
 		s:  s,
-		r:  r,
+		e:  e,
 	}
 }
 
