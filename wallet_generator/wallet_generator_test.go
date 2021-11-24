@@ -13,14 +13,14 @@ import (
 func TestGenerateWalletID(t *testing.T) {
 	g := wallet_generator.New()
 
-	keys := make(map[types.WalletID]struct{})
-	ch := make(chan types.WalletID, 1)
+	wallets := make(map[types.WalletID]struct{})
+	walletsCh := make(chan types.WalletID, 1)
 
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		for walletID := range ch {
-			keys[walletID] = struct{}{}
+		for walletID := range walletsCh {
+			wallets[walletID] = struct{}{}
 		}
 	}()
 
@@ -31,15 +31,16 @@ func TestGenerateWalletID(t *testing.T) {
 			defer wg.Done()
 			walletID, err := g.Generate()
 			require.NoError(t, err)
-			ch <- walletID
+			walletsCh <- walletID
 		}(i)
 	}
 
 	wg.Wait()
-	close(ch)
+	close(walletsCh)
 
+	// wait until all wallets written
 	<-done
 
 	// check if all wallet identifiers are unique
-	assert.Len(t, keys, 100_000)
+	assert.Len(t, wallets, 100_000)
 }
