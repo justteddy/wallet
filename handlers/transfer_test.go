@@ -43,6 +43,18 @@ func TestHandleTransfer(t *testing.T) {
 		assert.Equal(t, `{"error":"to_wallet is required"}`, rr.Body.String())
 	})
 
+	t.Run("validation error - similar wallets", func(t *testing.T) {
+		body := bytes.NewReader([]byte(`{"from_wallet": "wallet1", "to_wallet": "wallet1","amount": 100}`))
+		req, err := http.NewRequest(http.MethodPost, "/transfer", body)
+		require.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handlers.New(nil, nil, nil).HandleTransfer(rr, req, nil)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, `{"error":"similar wallets provided"}`, rr.Body.String())
+	})
+
 	t.Run("validation error - invalid amount", func(t *testing.T) {
 		body := bytes.NewReader([]byte(`{"from_wallet": "wallet1", "to_wallet": "wallet2","amount": -10}`))
 		req, err := http.NewRequest(http.MethodPost, "/transfer", body)
