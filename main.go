@@ -113,7 +113,7 @@ func setupLogger(env string) {
 
 func setupRouter() http.Handler {
 	router := httprouter.New()
-	router.POST("/wallet")
+	//router.POST("/wallet")
 
 	return router
 }
