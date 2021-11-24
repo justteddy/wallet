@@ -1,3 +1,6 @@
+CREATE DATABASE wallets;
+\connect wallets;
+
 CREATE TABLE IF NOT EXISTS wallet (
     id VARCHAR(64) PRIMARY KEY,
     balance INTEGER NOT NULL,

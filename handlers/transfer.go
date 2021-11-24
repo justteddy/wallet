@@ -27,5 +27,6 @@ func (h *Handler) HandleTransfer(w http.ResponseWriter, r *http.Request, params 
 		return
 	}
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }

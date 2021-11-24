@@ -31,5 +31,6 @@ func (h *Handler) HandleDeposit(w http.ResponseWriter, r *http.Request, params h
 		return
 	}
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }

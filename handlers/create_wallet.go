@@ -32,6 +32,7 @@ func (h *Handler) HandleCreateWallet(w http.ResponseWriter, r *http.Request, _ h
 		return
 	}
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(resp); err != nil {
 		log.WithError(err).Error("failed to write successful response")

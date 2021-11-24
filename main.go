@@ -12,6 +12,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justteddy/wallet/handlers"
+	"github.com/justteddy/wallet/storage"
+	"github.com/justteddy/wallet/wallet_generator"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
@@ -23,7 +25,7 @@ var (
 	port            = flag.String("port", ":8080", "port for http connections")
 	shutdownTimeout = flag.Duration("shutdown-timeout", time.Second*5, "shutdown timeout")
 
-	dbDSN      = flag.String("db-dsn", "postgres://postgres:postgres@localhost:5432?sslmode=disable", "database dsn")
+	dbDSN      = flag.String("db-dsn", "postgres://postgres:postgres@localhost:5432/wallets?sslmode=disable", "database dsn")
 	dbConnPool = flag.Int("db-conn-pool", 10, "database connection pool")
 )
 
@@ -34,9 +36,15 @@ func main() {
 	dbConn, err := setupDatabase(*dbDSN, *dbConnPool)
 	mustNoError(err)
 
-	httpServer := setupHTTPServer(*port, setupRouter(nil))
+	handler := handlers.New(
+		wallet_generator.New(),
+		storage.New(dbConn),
+		nil,
+	)
 
+	httpServer := setupHTTPServer(*port, setupRouter(handler))
 	httpErrCh := startHTTPServer(httpServer)
+
 	log.Infof("service is ready to accept connections on port %s", *port)
 
 	sigs := make(chan os.Signal, 1)
