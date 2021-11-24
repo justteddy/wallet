@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateWalletHandler(t *testing.T) {
+func TestHandleCreateWallet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -29,7 +29,7 @@ func TestCreateWalletHandler(t *testing.T) {
 			Return(types.WalletID(""), errors.New("some error"))
 
 		rr := httptest.NewRecorder()
-		handlers.New(generatorMock, nil, nil).CreateWallet(rr, req, nil)
+		handlers.New(generatorMock, nil, nil).HandleCreateWallet(rr, req, nil)
 
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 		assert.Equal(t, `{"error":"generate wallet id: some error"}`, rr.Body.String())
@@ -49,7 +49,7 @@ func TestCreateWalletHandler(t *testing.T) {
 			Return(errors.New("storage error"))
 
 		rr := httptest.NewRecorder()
-		handlers.New(generatorMock, storageMock, nil).CreateWallet(rr, req, nil)
+		handlers.New(generatorMock, storageMock, nil).HandleCreateWallet(rr, req, nil)
 
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 		assert.Equal(t, `{"error":"create wallet: storage error"}`, rr.Body.String())
@@ -69,7 +69,7 @@ func TestCreateWalletHandler(t *testing.T) {
 			Return(nil)
 
 		rr := httptest.NewRecorder()
-		handlers.New(generatorMock, storageMock, nil).CreateWallet(rr, req, nil)
+		handlers.New(generatorMock, storageMock, nil).HandleCreateWallet(rr, req, nil)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, `{"wallet_id":"walletID"}`, rr.Body.String())

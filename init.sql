@@ -14,5 +14,6 @@ CREATE TABLE IF NOT EXISTS operations (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX wallet_operation_idx ON operations USING BTREE (wallet_id, operation_type);
+CREATE INDEX wallet_idx ON operations USING HASH (wallet_id);
+CREATE INDEX operation_type_idx ON operations USING HASH (operation_type);
 CREATE INDEX created_at_idx ON operations USING BTREE (created_at);

@@ -32,14 +32,14 @@ type reporter interface {
 	)
 }
 
-type handler struct {
+type Handler struct {
 	wg walletGenerator
 	s  storage
 	r  reporter
 }
 
-func New(wg walletGenerator, s storage, r reporter) *handler {
-	return &handler{
+func New(wg walletGenerator, s storage, r reporter) *Handler {
+	return &Handler{
 		wg: wg,
 		s:  s,
 		r:  r,

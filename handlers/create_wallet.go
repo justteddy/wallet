@@ -10,11 +10,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type CreateWalletResponse struct {
+type createWalletResponse struct {
 	WalletID types.WalletID `json:"wallet_id"`
 }
 
-func (h *handler) CreateWallet(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) HandleCreateWallet(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	walletID, err := h.wg.Generate()
 	if err != nil {
 		writeErrorResponse(w, http.StatusInternalServerError, errors.Wrap(err, "generate wallet id"))
@@ -26,7 +26,7 @@ func (h *handler) CreateWallet(w http.ResponseWriter, r *http.Request, _ httprou
 		return
 	}
 
-	resp, err := json.Marshal(&CreateWalletResponse{WalletID: walletID})
+	resp, err := json.Marshal(&createWalletResponse{WalletID: walletID})
 	if err != nil {
 		writeErrorResponse(w, http.StatusInternalServerError, errors.Wrap(err, "marshal response"))
 		return

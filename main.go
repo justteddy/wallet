@@ -11,6 +11,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
+	"github.com/justteddy/wallet/handlers"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
@@ -33,22 +34,7 @@ func main() {
 	dbConn, err := setupDatabase(*dbDSN, *dbConnPool)
 	mustNoError(err)
 
-	httpServer := setupHTTPServer(*port, setupRouter())
-
-	shutdownFunc := func() {
-		ctx, cancel := context.WithTimeout(context.Background(), *shutdownTimeout)
-		defer cancel()
-
-		if err := httpServer.Shutdown(ctx); err != nil {
-			log.WithError(err).Error("http server shutdown")
-		}
-		log.Info("http server stopped")
-
-		if err := dbConn.Close(); err != nil {
-			log.WithError(err).Error("db conn close")
-		}
-		log.Info("db connection closed")
-	}
+	httpServer := setupHTTPServer(*port, setupRouter(nil))
 
 	httpErrCh := startHTTPServer(httpServer)
 	log.Infof("service is ready to accept connections on port %s", *port)
@@ -59,10 +45,10 @@ func main() {
 	select {
 	case <-sigs:
 		log.Info("received signal to stop service")
-		shutdownFunc()
+		shutdown(httpServer, dbConn, *shutdownTimeout)
 	case <-httpErrCh:
 		log.WithError(err).Error("http server error")
-		shutdownFunc()
+		shutdown(httpServer, dbConn, *shutdownTimeout)
 	}
 
 	log.Info("bye 👋")
@@ -111,11 +97,27 @@ func setupLogger(env string) {
 
 }
 
-func setupRouter() http.Handler {
+func setupRouter(handler *handlers.Handler) http.Handler {
 	router := httprouter.New()
-	//router.POST("/wallet")
+	router.POST("/wallet", handler.HandleCreateWallet)
+	router.POST("/deposit/:wallet", handler.HandleDeposit)
 
 	return router
+}
+
+func shutdown(httpServer *http.Server, dbConn *sqlx.DB, shutdownTimeout time.Duration) {
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancel()
+
+	if err := httpServer.Shutdown(ctx); err != nil {
+		log.WithError(err).Error("http server shutdown")
+	}
+	log.Info("http server stopped")
+
+	if err := dbConn.Close(); err != nil {
+		log.WithError(err).Error("db conn close")
+	}
+	log.Info("db connection closed")
 }
 
 func mustNoError(err error) {
