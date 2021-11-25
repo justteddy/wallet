@@ -11,6 +11,10 @@ import (
 var headers = []string{"wallet_id", "operation_id", "amount", "date"}
 
 func Format(ops []types.ExportOperation) ([]byte, error) {
+	if len(ops) == 0 {
+		return []byte{}, nil
+	}
+
 	buffer := bytes.NewBuffer(nil)
 	w := csv.NewWriter(buffer)
 	if err := w.Write(headers); err != nil {
