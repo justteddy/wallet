@@ -26,6 +26,11 @@ func (h *Handler) HandleDeposit(w http.ResponseWriter, r *http.Request, params h
 		return
 	}
 
+	if depositReq.Amount <= 0 {
+		writeErrorResponse(w, http.StatusBadRequest, errors.New("invalid amount"))
+		return
+	}
+
 	if err := h.s.Deposit(r.Context(), types.WalletID(walletID), depositReq.Amount); err != nil {
 		writeErrorResponse(w, http.StatusInternalServerError, errors.Wrap(err, "save to storage"))
 		return

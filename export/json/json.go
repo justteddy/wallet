@@ -6,6 +6,6 @@ import (
 	"github.com/justteddy/wallet/types"
 )
 
-func Format(ops []types.Operation) ([]byte, error) {
+func Format(ops []types.ExportOperation) ([]byte, error) {
 	return json.Marshal(ops)
 }

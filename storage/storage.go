@@ -108,7 +108,7 @@ func (s *storage) Transfer(ctx context.Context, fromWallet, toWallet types.Walle
 	return completeTx(tx, nil)
 }
 
-func (s *storage) Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.Operation, error) {
+func (s *storage) Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.DBOperation, error) {
 	where := ""
 	args := map[string]interface{}{
 		"wallet_id": wallet,
@@ -137,7 +137,7 @@ func (s *storage) Operations(ctx context.Context, wallet types.WalletID, opType 
 
 	query = s.conn.Rebind(query)
 
-	var ops []types.Operation
+	var ops []types.DBOperation
 	if err := s.conn.SelectContext(ctx, &ops, query, params...); err != nil {
 		return nil, errors.Wrap(err, "select operations")
 	}

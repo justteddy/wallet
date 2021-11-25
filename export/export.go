@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type exportFunc func(ops []types.Operation) ([]byte, error)
+type exportFunc func(ops []types.ExportOperation) ([]byte, error)
 
 type exporter struct {
 	toJSON exportFunc
@@ -21,7 +21,7 @@ func New() *exporter {
 	}
 }
 
-func (e *exporter) Export(format types.ExportFormat, ops []types.Operation) ([]byte, error) {
+func (e *exporter) Export(format types.ExportFormat, ops []types.ExportOperation) ([]byte, error) {
 	switch format {
 	case types.ExportFormatJSON:
 		return e.toJSON(ops)

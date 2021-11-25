@@ -39,7 +39,7 @@ func (h *Handler) HandleReport(w http.ResponseWriter, r *http.Request, params ht
 		return
 	}
 
-	data, err := h.e.Export(types.ExportFormat(format), ops)
+	data, err := h.e.Export(types.ExportFormat(format), types.TransformDBToExportOperation(ops))
 	if err != nil {
 		writeErrorResponse(w, http.StatusInternalServerError, errors.Wrap(err, "export operations"))
 		return

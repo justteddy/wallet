@@ -32,7 +32,7 @@ var (
 	)
 
 	querySelectOperations = removeExtraWhitespaces(`
-		SELECT wallet_id, operation_type, amount, TO_CHAR(created_at, 'YYYY-MM-DD') as date
+		SELECT wallet_id, operation_type, amount, TO_CHAR(created_at, 'YYYY-MM-DD') as created_at
 		FROM operations
 		WHERE wallet_id = :wallet_id %s
 		ORDER BY created_at DESC`,

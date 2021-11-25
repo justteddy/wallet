@@ -103,10 +103,10 @@ func (mr *MockstorageMockRecorder) Deposit(ctx, wallet, amount interface{}) *gom
 }
 
 // Operations mocks base method.
-func (m *Mockstorage) Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.Operation, error) {
+func (m *Mockstorage) Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.DBOperation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Operations", ctx, wallet, opType, from, to)
-	ret0, _ := ret[0].([]types.Operation)
+	ret0, _ := ret[0].([]types.DBOperation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -155,7 +155,7 @@ func (m *Mockexporter) EXPECT() *MockexporterMockRecorder {
 }
 
 // Export mocks base method.
-func (m *Mockexporter) Export(format types.ExportFormat, ops []types.Operation) ([]byte, error) {
+func (m *Mockexporter) Export(format types.ExportFormat, ops []types.ExportOperation) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Export", format, ops)
 	ret0, _ := ret[0].([]byte)

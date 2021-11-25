@@ -2,15 +2,15 @@ package types
 
 import (
 	"errors"
+
+	"github.com/justteddy/wallet/currency"
 )
 
 const (
 	DateLayout = "2006-01-02"
 )
 
-var (
-	ErrUnavailableBalance = errors.New("insufficient funds in the account")
-)
+var ErrUnavailableBalance = errors.New("insufficient funds in the account")
 
 type WalletID string
 
@@ -40,9 +40,30 @@ var (
 	}
 )
 
-type Operation struct {
+type DBOperation struct {
 	WalletID      WalletID      `db:"wallet_id"`
 	OperationType OperationType `db:"operation_type"`
 	Amount        int           `db:"amount"`
-	Date          string        `db:"date"`
+	CreatedAt     string        `db:"created_at"`
+}
+
+type ExportOperation struct {
+	WalletID      string `json:"wallet_id"`
+	OperationType string `json:"operation_type"`
+	Amount        string `json:"amount"`
+	Date          string `json:"date"`
+}
+
+func TransformDBToExportOperation(ops []DBOperation) []ExportOperation {
+	expOps := make([]ExportOperation, 0, len(ops))
+	for _, op := range ops {
+		expOps = append(expOps, ExportOperation{
+			WalletID:      string(op.WalletID),
+			OperationType: string(op.OperationType),
+			Amount:        currency.Format(op.Amount),
+			Date:          op.CreatedAt,
+		})
+	}
+
+	return expOps
 }

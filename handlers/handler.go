@@ -20,11 +20,11 @@ type storage interface {
 	CreateWallet(ctx context.Context, wallet types.WalletID) error
 	Deposit(ctx context.Context, wallet types.WalletID, amount int) error
 	Transfer(ctx context.Context, fromWallet, toWallet types.WalletID, amount int) error
-	Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.Operation, error)
+	Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.DBOperation, error)
 }
 
 type exporter interface {
-	Export(format types.ExportFormat, ops []types.Operation) ([]byte, error)
+	Export(format types.ExportFormat, ops []types.ExportOperation) ([]byte, error)
 }
 
 type Handler struct {

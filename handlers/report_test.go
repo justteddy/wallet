@@ -196,11 +196,11 @@ func TestHandleReport(t *testing.T) {
 		storageMock.EXPECT().
 			Operations(gomock.Any(), types.WalletID("walletID"), types.OperationTypeDeposit, fromDate, toDate).
 			Times(1).
-			Return([]types.Operation{}, nil)
+			Return([]types.DBOperation{}, nil)
 
 		exporterMock := mocks.NewMockexporter(ctrl)
 		exporterMock.EXPECT().
-			Export(types.ExportFormatJSON, []types.Operation{}).
+			Export(types.ExportFormatJSON, []types.ExportOperation{}).
 			Times(1).
 			Return(nil, errors.New("exporter error"))
 
@@ -233,11 +233,11 @@ func TestHandleReport(t *testing.T) {
 		storageMock.EXPECT().
 			Operations(gomock.Any(), types.WalletID("walletID"), types.OperationTypeDeposit, fromDate, toDate).
 			Times(1).
-			Return([]types.Operation{}, nil)
+			Return([]types.DBOperation{}, nil)
 
 		exporterMock := mocks.NewMockexporter(ctrl)
 		exporterMock.EXPECT().
-			Export(types.ExportFormatJSON, []types.Operation{}).
+			Export(types.ExportFormatJSON, []types.ExportOperation{}).
 			Times(1).
 			Return([]byte(`success`), nil)
 
