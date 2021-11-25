@@ -11,6 +11,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
+	"github.com/justteddy/wallet/export"
 	"github.com/justteddy/wallet/handlers"
 	"github.com/justteddy/wallet/storage"
 	"github.com/justteddy/wallet/wallet_generator"
@@ -39,7 +40,7 @@ func main() {
 	handler := handlers.New(
 		wallet_generator.New(),
 		storage.New(dbConn),
-		nil,
+		export.New(),
 	)
 
 	httpServer := setupHTTPServer(*port, setupRouter(handler))

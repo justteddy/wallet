@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -108,5 +109,38 @@ func (s *storage) Transfer(ctx context.Context, fromWallet, toWallet types.Walle
 }
 
 func (s *storage) Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.Operation, error) {
-	return nil, nil
+	where := ""
+	args := map[string]interface{}{
+		"wallet_id": wallet,
+	}
+
+	if opType != "" {
+		where += " AND operation_type = :operation_type"
+		args["operation_type"] = opType
+	}
+
+	if !from.IsZero() {
+		where += " AND created_at >= :from"
+		args["from"] = fmt.Sprintf("%s 00:00:00", from.Format(types.DateLayout))
+	}
+
+	if !to.IsZero() {
+		where += " AND created_at <= :to"
+		args["to"] = fmt.Sprintf("%s 23:59:59", to.Format(types.DateLayout))
+	}
+
+	query := removeExtraWhitespaces(fmt.Sprintf(querySelectOperations, where))
+	query, params, err := sqlx.Named(query, args)
+	if err != nil {
+		return nil, errors.Wrap(err, "prepare named query")
+	}
+
+	query = s.conn.Rebind(query)
+
+	var ops []types.Operation
+	if err := s.conn.SelectContext(ctx, &ops, query, params...); err != nil {
+		return nil, errors.Wrap(err, "select operations")
+	}
+
+	return ops, nil
 }

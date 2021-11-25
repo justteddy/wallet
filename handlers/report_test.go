@@ -131,6 +131,28 @@ func TestHandleReport(t *testing.T) {
 		assert.Contains(t, rr.Body.String(), "invalid date format in to_date")
 	})
 
+	t.Run("validation error - from_date greater than to_date", func(t *testing.T) {
+		body := bytes.NewReader([]byte(`{"from_date": "2030-01-02", "to_date": "2030-01-01","operation_type": "deposit"}`))
+		req, err := http.NewRequest(http.MethodPost, "/report", body)
+		require.NoError(t, err)
+
+		params := []httprouter.Param{
+			{
+				Key:   "format",
+				Value: "json",
+			},
+			{
+				Key:   "wallet",
+				Value: "walletID",
+			},
+		}
+		rr := httptest.NewRecorder()
+		handlers.New(nil, nil, nil).HandleReport(rr, req, params)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, `{"error":"from_date is greater than to_date"}`, rr.Body.String())
+	})
+
 	t.Run("storage error", func(t *testing.T) {
 		body := bytes.NewReader([]byte(`{"from_date": "2030-01-01", "to_date": "2030-01-01","operation_type": "deposit"}`))
 		req, err := http.NewRequest(http.MethodPost, "/report", body)

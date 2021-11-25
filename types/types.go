@@ -4,6 +4,10 @@ import (
 	"errors"
 )
 
+const (
+	DateLayout = "2006-01-02"
+)
+
 var (
 	ErrUnavailableBalance = errors.New("insufficient funds in the account")
 )
@@ -37,8 +41,8 @@ var (
 )
 
 type Operation struct {
-	WalletID      WalletID      `json:"wallet_id" csv:"wallet_id"`
-	OperationType OperationType `json:"operation_type" csv:"operation_type"`
-	Amount        int           `json:"amount" csv:"amount"`
-	Date          string        `json:"date" csv:"date"`
+	WalletID      WalletID      `db:"wallet_id"`
+	OperationType OperationType `db:"operation_type"`
+	Amount        int           `db:"amount"`
+	Date          string        `db:"date"`
 }

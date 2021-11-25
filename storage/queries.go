@@ -30,4 +30,11 @@ var (
 	queryUpdateWallet = removeExtraWhitespaces(`
 		UPDATE wallet SET balance = $1 WHERE id = $2`,
 	)
+
+	querySelectOperations = removeExtraWhitespaces(`
+		SELECT wallet_id, operation_type, amount, TO_CHAR(created_at, 'YYYY-MM-DD') as date
+		FROM operations
+		WHERE wallet_id = :wallet_id %s
+		ORDER BY created_at DESC`,
+	)
 )

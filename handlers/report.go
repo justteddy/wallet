@@ -45,6 +45,10 @@ func (h *Handler) HandleReport(w http.ResponseWriter, r *http.Request, params ht
 		return
 	}
 
+	if format == string(types.ExportFormatJSON) {
+		w.Header().Add("Content-Type", "application/json")
+	}
+
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(data); err != nil {
 		log.WithError(err).Error("failed to write successful response")
@@ -73,15 +77,19 @@ func (h *Handler) validateReportRequest(format, walletID string, reportReq repor
 
 	var err error
 	if reportReq.FromDate != "" {
-		if fromDate, err = time.Parse("2006-01-02", reportReq.FromDate); err != nil {
-			return fromDate, toDate, errors.Wrap(err, "invalid date format in from_date")
+		if fromDate, err = time.Parse(types.DateLayout, reportReq.FromDate); err != nil {
+			return fromDate, toDate, errors.Wrap(err, "invalid date format in from_date, should be YYYY-MM-DD")
 		}
 	}
 
 	if reportReq.ToDate != "" {
-		if toDate, err = time.Parse("2006-01-02", reportReq.ToDate); err != nil {
-			return fromDate, toDate, errors.Wrap(err, "invalid date format in to_date")
+		if toDate, err = time.Parse(types.DateLayout, reportReq.ToDate); err != nil {
+			return fromDate, toDate, errors.Wrap(err, "invalid date format in to_date, should be YYYY-MM-DD")
 		}
+	}
+
+	if fromDate.After(toDate) {
+		return fromDate, toDate, errors.New("from_date is greater than to_date")
 	}
 
 	return fromDate, toDate, nil
