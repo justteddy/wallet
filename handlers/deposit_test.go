@@ -20,15 +20,33 @@ func TestHandleDeposit(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	t.Run("empty wallet", func(t *testing.T) {
+	t.Run("validation error - empty wallet", func(t *testing.T) {
 		req, err := http.NewRequest(http.MethodPost, "/deposit", nil)
 		require.NoError(t, err)
 
 		rr := httptest.NewRecorder()
-		handlers.New(nil, nil, nil).HandleDeposit(rr, req, []httprouter.Param{})
+		handlers.New(nil, nil, nil).HandleDeposit(rr, req, nil)
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 		assert.Equal(t, `{"error":"empty wallet id"}`, rr.Body.String())
+	})
+
+	t.Run("validation error - invalid amount", func(t *testing.T) {
+		body := bytes.NewReader([]byte(`{"amount": -1}`))
+		req, err := http.NewRequest(http.MethodPost, "/deposit/walletID", body)
+		require.NoError(t, err)
+
+		params := []httprouter.Param{
+			{
+				Key:   "wallet",
+				Value: "walletID",
+			},
+		}
+		rr := httptest.NewRecorder()
+		handlers.New(nil, nil, nil).HandleDeposit(rr, req, params)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, `{"error":"invalid amount"}`, rr.Body.String())
 	})
 
 	t.Run("storage error", func(t *testing.T) {
