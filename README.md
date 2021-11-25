@@ -8,12 +8,21 @@ Start service `make up`
 
 Stop service `make down`
 
-## How to start in dev mode with database in docker
+## How to start in dev mode
 Build binary `go build -o ./wallet`
 
 Start database in docker `docker-compose up -d db`
 
 Run binary `./wallet`
+
+You can specify your own command line arguments, instead of defaults:
+```
+--env              "environment (dev|prod)
+--port             "port for http connections, default 8080"
+--shutdown-timeout "shutdown timeout, default 5 sec"
+--db-dsn           "database dsn"
+--db-conn-pool     "database connection pool"
+```
 
 ## Maintenance commands
 Run unit tests - `make test`
