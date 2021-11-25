@@ -68,7 +68,7 @@ func TestIntegration(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			transfer(t, httpClient, payload)
+			transfer(t, httpClient, payload, http.StatusOK)
 		}()
 	}
 
@@ -94,20 +94,24 @@ func TestIntegration(t *testing.T) {
 		assert.Equal(t, time.Now().Format(types.DateLayout), op.Date)
 	}
 
+	// ensure that wallet1 doesn't have enough amount to transfer 50.01$ (there are only 50.00$)
+	payload = transferPayload(wallet1, wallet2, 5001)
+	transfer(t, httpClient, payload, http.StatusBadRequest)
+
 	// ensure that there is no operations for tomorrow
 	tomorrow := time.Now().AddDate(0, 0, 1).Format(types.DateLayout)
 	ops = reportJSON(t, httpClient, wallet2, reportPayload(tomorrow, tomorrow, ""))
 	assert.Len(t, ops, 0)
 }
 
-func transfer(t *testing.T, httpClient *http.Client, payload []byte) {
+func transfer(t *testing.T, httpClient *http.Client, payload []byte, expectedStatusCode int) {
 	reader := bytes.NewReader(payload)
 	req, err := http.NewRequest("POST", host+transferURL, reader)
 	require.NoError(t, err)
 
 	resp, err := httpClient.Do(req)
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, expectedStatusCode, resp.StatusCode)
 }
 
 func transferPayload(fromWallet, toWallet string, amount int) []byte {
