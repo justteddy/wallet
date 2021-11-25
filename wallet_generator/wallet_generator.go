@@ -20,7 +20,7 @@ func New() *generator {
 
 // Generate generates unique wallet identifier.
 // It works properly in scope of single service instance.
-// In case of multi instance service run should use some distributed mechanisms like - database sequence, etcd, etc.
+// In case of multi instance service run should use some distributed mechanisms like global locks, database sequences, etcd, etc.
 func (g *generator) Generate() (types.WalletID, error) {
 	current := atomic.AddInt64(&g.current, 1)
 	key := fmt.Sprintf("%d", int64(time.Now().UTC().Nanosecond())+current)
