@@ -88,8 +88,10 @@ func (h *Handler) validateReportRequest(format, walletID string, reportReq repor
 		}
 	}
 
-	if fromDate.After(toDate) {
-		return fromDate, toDate, errors.New("from_date is greater than to_date")
+	if !fromDate.IsZero() && !toDate.IsZero() {
+		if fromDate.After(toDate) {
+			return fromDate, toDate, errors.New("from_date is greater than to_date")
+		}
 	}
 
 	return fromDate, toDate, nil
