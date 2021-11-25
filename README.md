@@ -8,6 +8,13 @@ Start service `make up`
 
 Stop service `make down`
 
+## How to start in dev mode with database in docker
+Build binary `go build -o ./wallet`
+
+Start database in docker `docker-compose up -d db`
+
+Run binary `./wallet`
+
 ## Maintenance commands
 Run unit tests - `make test`
 
