@@ -1,5 +1,8 @@
 # Wallet service
 
+## Prerequisites
+Docker and docker-compose are required to run locally
+
 ## How to start/stop service in docker
 Start service `make up`
 
