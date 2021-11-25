@@ -13,17 +13,23 @@ import (
 )
 
 type walletGenerator interface {
+	// Generate generates new unique WalletID
 	Generate() (types.WalletID, error)
 }
 
 type storage interface {
+	// CreateWallet creates new wallet in storage with `wallet` identifier
 	CreateWallet(ctx context.Context, wallet types.WalletID) error
+	// Deposit increases wallet balance by amount value
 	Deposit(ctx context.Context, wallet types.WalletID, amount int) error
+	// Transfer transfers amount value from one wallet to another
 	Transfer(ctx context.Context, fromWallet, toWallet types.WalletID, amount int) error
+	// Operations fetches wallet operations by optional filters - operation type and date range
 	Operations(ctx context.Context, wallet types.WalletID, opType types.OperationType, from, to time.Time) ([]types.DBOperation, error)
 }
 
 type exporter interface {
+	// Export exports operations in the specified format
 	Export(format types.ExportFormat, ops []types.ExportOperation) ([]byte, error)
 }
 

@@ -6,9 +6,7 @@ import (
 	"github.com/justteddy/wallet/currency"
 )
 
-const (
-	DateLayout = "2006-01-02"
-)
+const DateLayout = "2006-01-02"
 
 var ErrUnavailableBalance = errors.New("insufficient funds in the account")
 
@@ -54,6 +52,7 @@ type ExportOperation struct {
 	Date          string `json:"date"`
 }
 
+// TransformDBToExportOperation transforms DBOperation to ExportOperation
 func TransformDBToExportOperation(ops []DBOperation) []ExportOperation {
 	expOps := make([]ExportOperation, 0, len(ops))
 	for _, op := range ops {

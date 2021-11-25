@@ -21,6 +21,7 @@ func New() *exporter {
 	}
 }
 
+// Export marshals []types.ExportOperation to []byte using different formats
 func (e *exporter) Export(format types.ExportFormat, ops []types.ExportOperation) ([]byte, error) {
 	switch format {
 	case types.ExportFormatJSON:
