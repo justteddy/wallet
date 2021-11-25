@@ -5,7 +5,11 @@ down:
 	docker-compose down
 
 test:
-	LOG_LEVEL=panic go test -cover -v -parallel 8 ./...
+	go test -cover -v -parallel 8 ./...
+
+integration-test: up
+	go test -v -tags integration -count 1 -p 1 ./tests/...
+	make down
 
 lint:
 	golangci-lint run --verbose
